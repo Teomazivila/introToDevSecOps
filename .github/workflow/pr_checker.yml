@@ -1,0 +1,34 @@
+name: Repository PR Checker
+
+on:
+  workflow_call:
+jobs:
+  kubeconform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: docker://ghcr.io/yannh/kubeconform:latest
+        with:
+          entrypoint: '/kubeconform'
+          args: '
+            -summary 
+            -output json 
+            -ignore-filename-pattern "secret" 
+            -ignore-filename-pattern "patch"
+            -ignore-filename-pattern "dd_version"
+            -ignore-filename-pattern "kustomization" 
+            -ignore-filename-pattern ".github" 
+            -ignore-filename-pattern "/url" 
+            -skip "
+            SealedSecret,
+            Rollout,
+            CustomResourceDefinition,
+            ClusterIssuer,
+            Application,
+            Certificate,
+            Issuer,
+            IngressClassParams
+            " 
+            .
+            '
